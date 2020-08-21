@@ -3,13 +3,12 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>.deduplicatify_</title>
+        <title>Dewoh</title>
         <link rel="icon" href="assets/logo_black.svg">
         <link rel="stylesheet" href="hayeselnut.github.io/styles.css">
     </head>
 
-    <body class="gotham">
-        <!-- header nav section footer -->
+    <body class="open-sans">
         <header>
             <nav>
                 <ul>
@@ -19,66 +18,28 @@
 
             <div class="cover">
                 <div class="flexbox">
-                    <h1 class="title">.deduplicatify_</h1>
-                    <img src="assets/logo_green.svg"/>
+                    <h1 class="title friz-quadrata">.dewoh</h1>
+                    <img src="assets/logo-outline.svg"/>
                 </div>
 
-
                 <div class="input">
-                    <!-- <p>Ignore:</p>
-                    <input id="ignore-remix" type="checkbox" value="remix">
-                    <label for="ignore-remix">remixes</label><br>
-                    <input id="ignore-live" type="checkbox" value="live">
-                    <label for="ignore-live">live performances</label><br>
-                    <input id="ignore-acoustic" type="checkbox" value="acoustic">
-                    <label for="ignore-acoustic">acoustic covers</label><br> -->
-
-                    <input id="dedup-txtbox" type="text" placeholder="Enter your Spotify playlist link">
+                    <input id="sum1-txtbox" type="text" placeholder="Summoner Name 1">
+                    <input id="sum2-txtbox" type="text" placeholder="Summoner Name 2">
+                    <!-- DROP DOWN MENU, LAST WEEK/MONTH/3 MONTHS/6 MONTHS/ YEAR/ ALL TIME*** where all time is whatever the api lets me -->
                     <br/>
-                    <button class="spotify-button" id="dedup-btn">Detect duplicates</button>
+                    <button class="spotify-button" id="dewoh-btn">Find games</button>
                 </div>
             </div>
         </header>
 
-        <section class="description" id="dedup-desc">
+        <section class="description" id="dewoh-desc">
             <p>
-                <strong>Deduplicatify</strong> detects any duplicate songs in a Spotify playlist even if they are from different albums.
-                The detection algorithm will label two songs as duplicates if their:
+                <strong>Dewoh</strong> calculates the win rate between two summoners over time.
             </p>
-            <ul>
-                <li>song names are similar</li>
-                <li>artists are the same</li>
-                <li>song length is within 2.5 seconds of each other.</li>
-            </ul>
-
-            <p>
-                The algorithm also does not label remixed, live and acoustic versions as a duplicate of their original counterpart.
-            </p>
-            <p>
-                You can copy a Spotify playlist link as shown below. Enter yours below to detect any duplicate songs in your playlist.
-            </p>
-            <p>
-                <em>FUTURE FUNCTIONALITY: button to delete duplicates (requires login details)</em>
-            </p>
-            <img src="assets/copy_playlist_link.png" alt="how to copy Spotify playlist link"/>
         </section>
 
-        <section class="results" id="dedup-results">
-            <div class="flexbox" id="playlist-metadata">
-                <div id="playlist-info">
-                    <h2 id="playlist-name"></h2>
-                    <h3 id="playlist-owner"></h3>
-                    <p id="playlist-length"></p>
-                    <p id="playlist-desc"></p>
-                </div>
-                <div class="playlist-artwork">
-                    <img id="playlist-img" src=""/>
-                </div>
-            </div>
-            <div id="sim-songs"></div>
-            <div class="flexbox">
-                <button class="spotify-button" id="remove-dupes-btn">Remove duplicates (this button doesnt do anything lol)</button>
-            </div>
+        <section class="results" id="dewoh-results">
+            <!-- THREE COLUMNS, BY QUEUE, BY ROLE, BY CHAMPS (top 5) -->
         </section>
 
         <footer>
