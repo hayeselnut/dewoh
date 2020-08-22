@@ -22,12 +22,27 @@
                     <img src="assets/logo-outline-nobg.svg"/>
                 </div>
 
-                <div class="input flexbox">
-                    <input id="sum1-txtbox" type="text" placeholder="Summoner Name 1">
-                    <input id="sum2-txtbox" type="text" placeholder="Summoner Name 2">
+                <div class="input">
+                    <div class="flexbox">
+                        <input id="sum1-txtbox" type="text" placeholder="Summoner Name">
+                        <input id="sum2-txtbox" type="text" placeholder="Summoner Name">
+                        <select name="region" id="region">
+                            <option value="oc1">OCE</option>
+                            <option value="br1">BR</option>
+                            <option value="eun1">EUNE</option>
+                            <option value="euw1">EUW</option>
+                            <option value="jp1">KR</option>
+                            <option value="kr">KR</option>
+                            <option value="la1">LAN</option>
+                            <option value="la2">LAS</option>
+                            <option value="na1">NA</option>
+                            <option value="tr1">TR</option>
+                            <option value="ru">RU</option>
+                        </select>
+                    </div>
                     <!-- DROP DOWN MENU, LAST WEEK/MONTH/3 MONTHS/6 MONTHS/ YEAR/ ALL TIME*** where all time is whatever the api lets me -->
                     <br/>
-                    <button class="spotify-button" id="dewoh-btn">Find games</button>
+                    <button class="dewoh-button" id="dewoh-btn">Find games</button>
                 </div>
             </div>
         </header>
@@ -45,9 +60,23 @@
                 <li>Sort results by champion</li>
                 <li>[ DONE ] Sort results by queue</li>
             </ul>
+            <p>
+                FRONTEND: HTML, CSS, Javascript
+            </p>
+
+            <p>
+                DATABASE: Firebase
+            </p>
+            <p>
+                PROXY: AWS Lambdas and AWS API Gateway since Riot Games API enforces server-to-server communications.
+            </p>
         </section>
 
         <section class="results" id="dewoh-results">
+            <div id="summoner-metadata">
+                <!-- SUMMONER ICONS AND LEVELS -->
+            </div>
+
             <!-- THREE COLUMNS, BY QUEUE, BY ROLE, BY CHAMPS (top 5) -->
         </section>
 
@@ -55,6 +84,29 @@
             <a href="https://github.com/hayeselnut" target="_blank"><img src="hayeselnut.github.io/assets/footer/github-dgrey.svg" class="svg"/></a>
             <a href="https://www.linkedin.com/in/hayes-choy-293954153/" target="_blank"><img src="hayeselnut.github.io/assets/footer/linkedin-dgrey.svg" class="svg"/></a>
         </footer>
+
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-analytics.js"></script>
+
+        <script>
+            // Your web app's Firebase configuration
+            var firebaseConfig = {
+                apiKey: "AIzaSyBFURvLGD0e3-VnfUXojHeuWO-hxyP6MO4",
+                authDomain: "hayeselnut-github-io.firebaseapp.com",
+                databaseURL: "https://hayeselnut-github-io.firebaseio.com",
+                projectId: "hayeselnut-github-io",
+                storageBucket: "hayeselnut-github-io.appspot.com",
+                messagingSenderId: "385938522581",
+                appId: "1:385938522581:web:b3460e29acc1ce3f0cfd5c",
+                measurementId: "G-FL15ZQETCC"
+            };
+
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            firebase.analytics();
+        </script>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="main.js"></script>
