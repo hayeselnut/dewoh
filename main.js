@@ -2,6 +2,8 @@
 
 let latestVersion;
 
+let QUEUES;
+
 const WIN = 1;
 const LOSE = 0;
 const VS = -1;
@@ -41,8 +43,27 @@ function getLatestVersion() {
     });
 }
 
+function getQueues() {
+    $.ajax({
+        type: "GET",
+        url: "http://static.developer.riotgames.com/docs/lol/queues.json",
+        success: response => {
+            QUEUES = response;
+            console.log("queues received", QUEUES);
+        }, error: () => {
+            console.log("couldn't find queues");
+        }
+    })
+}
+
+function getQueueName(queueId) {
+    // Using == instead of === beause queueId will be passed as a string
+    return QUEUES.filter(q => q.queueId == queueId)[0].description;
+}
+
 $(document).ready(() => {
     getLatestVersion();
+    getQueues();
 });
 
 function getSummonerDTO(region, name) {
@@ -76,7 +97,7 @@ function getMatchDTO(region, gameId) {
         type: "GET",
         url: `https://dkwuj1k34l.execute-api.us-east-2.amazonaws.com/rgapi/match/${region}/${gameId}`,
         success: response => {
-            console.log("game info found, ", response);
+            // console.log("game info found, ", response);
             return response;
         }, error: err => {
             console.log("err get match", err);
@@ -174,7 +195,13 @@ function checkWin(matchDTO, teamId) {
 async function getGameOutcomes(commonGames, region, id1, id2) {
     // WHEN I GET BETTER API LIMITS: const commonMatchDTOs = await Promise.all(commonGames.map(m => getMatchDTO(region, m)));
 
-    const results = { "win": 0, "loss": 0 };
+    const results = {
+        "win": 0,
+        "loss": 0,
+        "byQueue": {},
+        "byRole": {},
+        "byChampion": {}
+    };
 
     for (let i = 0; i < commonGames.length; i++) {
         showStatus(`Checking ${i + 1} out of ${commonGames.length} games`);
@@ -189,20 +216,20 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
 
         const queueId = getQueueId(matchDTO);
 
-        if (!(queueId in results)) {
-            results[queueId] = { "win": 0, "loss": 0 };
+        if (!(queueId in results.byQueue)) {
+            results.byQueue[queueId] = { "win": 0, "loss": 0 };
         }
 
         const win = checkWin(matchDTO, teamId);
 
         if (win) {
             results.win++;
-            results[queueId].win++;
-            console.log("win");
+            results.byQueue[queueId].win++;
+            console.log("win", results);
         } else {
             results.loss++;
-            results[queueId].loss++;
-            console.log("loss");
+            results.byQueue[queueId].loss++;
+            console.log("loss", results);
         }
 
         await sleep(1000);
@@ -219,8 +246,51 @@ function transformSummonerName(name) {
     return name.toLowerCase().split(" ").join("");
 }
 
+function showResults(results) {
+    console.log(results);
 
-$("#dewoh-btn").on("click", async () => {
+    // Show overall
+    const totalGames = results.win + results.loss;
+    const totalWins = results.win;
+    const totalWinRate = (100.0 * totalWins / totalGames).toFixed(2);
+
+    $("#overall").html(`
+        <h2>Overall win rate: ${totalWinRate}%</h2>
+        <p>${totalWins} games won out of ${totalGames} games played</p>
+    `);
+
+    // Show by queue
+    let qAnalaysis = "";
+    for (const [qId, qResults] of Object.entries(results.byQueue)) {
+        console.log("CHECKING QUEUE", qId, qResults);
+        const qGames = qResults.win + qResults.loss;
+        const qWins = qResults.win;
+        const qWinRate = (100.0 * qWins / qGames).toFixed(2);
+
+        const qDesc = getQueueName(qId);
+
+        qAnalaysis += `<p><strong>${qDesc} - ${qWinRate}%</strong><br/>${qWins} / ${qGames} games won</p>`;
+      }
+
+      $("#by-queue").html(qAnalaysis);
+
+    // Show by roles
+    // Show by champion
+}
+
+
+function clickButton(event) {
+    if (event.which == 13) { // Enter key
+        $("#dewoh-btn").click();
+    }
+}
+
+$("#sum1-txtbox").on("keydown", clickButton);
+$("#sum2-txtbox").on("keydown", clickButton);
+
+// NEED TO MAKE SURE NO DOUBLE CLICK BUTTON (disable button?)
+$("#dewoh-btn").on("click", async function() {
+    $(this).prop("disabled", true);
     const region = $("#region").val();
     const name1 = transformSummonerName($("#sum1-txtbox").val());
     const name2 = transformSummonerName($("#sum2-txtbox").val());
@@ -233,6 +303,17 @@ $("#dewoh-btn").on("click", async () => {
     if (name2 === "") {
         console.log("name2 is blank");
         $("#sum2-txtbox").addClass("invalid-input").attr("placeholder", "Please enter a summoner name");
+    }
+
+    if (name1 === "" || name2 === "") {
+        $(this).prop("disabled", false);
+        return;
+    }
+
+    if (name1 === name2) {
+        showStatus("Please enter two different summoner names");
+        $(this).prop("disabled", false);
+        return;
     }
 
     $("#summoner-metadata").empty();
@@ -258,12 +339,15 @@ $("#dewoh-btn").on("click", async () => {
 
         const results = await getGameOutcomes(commonGames, region, id1, id2);
 
-        showStatus("Results are as follows:");
+        showStatus("");
+        showResults(results);
 
-        showStatus(JSON.stringify(results));
+        // showStatus(JSON.stringify(results));
 
     } else {
         showStatus("No common games found this year");
     }
+
+    $(this).prop("disabled", false);
 
 });
