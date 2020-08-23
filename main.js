@@ -46,7 +46,7 @@ function getLatestVersion() {
 function getQueues() {
     $.ajax({
         type: "GET",
-        url: "http://raw.communitydragon.org/pbe/plugins/rcp-be-lol-game-data/global/default/v1/queues.json",
+        url: "https://hayeselnut.github.io/dewoh/queues.json",
         success: response => {
             QUEUES = response;
             console.log("queues received", QUEUES);
