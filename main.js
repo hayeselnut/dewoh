@@ -18,8 +18,8 @@ function getIntersection(arr1, arr2) {
 }
 
 function showStatus(statusMessage) {
-    const duration = 1000;
-    const style = "h2"
+    const duration = 500;
+    const style = "h3"
 
     $("#status").fadeOut(duration, () => {
         $("#status").html(`<${style}>${statusMessage}</${style}>`).fadeIn(duration);
@@ -90,9 +90,21 @@ function showSummonerMetadata(summonerDTO) {
     const summonerIcon = summonerDTO.profileIconId;
     const level = summonerDTO.summonerLevel;
 
-    $("#dewoh-results").css("display", "block");
-    $("#summoner-metadata").append(`<p>${name}, Level ${level} - icon: ${summonerIcon}</p>`);
-    $("#summoner-metadata").append(`<img src="https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/profileicon/${summonerIcon}.png"</img>`);
+    $("#dewoh-results").css("display", "block").css("visibility", "hidden");
+    $("#dewoh-desc").slideUp(500, () => {
+        $("#dewoh-results").css("visibility", "visible").fadeIn(500);
+    });
+
+    let append = `
+        <div class="flexbox">
+            <img src="https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/profileicon/${summonerIcon}.png"</img>
+            <div>
+                <h2>${name}</h2>
+                <p>Level ${level}</p>
+            </div>
+        </div>
+    `;
+    $("#summoner-metadata").append(append);
 }
 
 async function getSummonerId(region, name) {
@@ -149,6 +161,11 @@ function getTeamId(matchDTO, id1, id2) {
     return VS;
 }
 
+// Gets queueId of game
+function getQueueId(matchDTO) {
+    return matchDTO.queueId;
+}
+
 // Checks if the given team is won the game
 function checkWin(matchDTO, teamId) {
     return matchDTO.teams.filter(t => t.teamId === teamId)[0].win == "Win";
@@ -157,10 +174,7 @@ function checkWin(matchDTO, teamId) {
 async function getGameOutcomes(commonGames, region, id1, id2) {
     // WHEN I GET BETTER API LIMITS: const commonMatchDTOs = await Promise.all(commonGames.map(m => getMatchDTO(region, m)));
 
-    const results = {
-        "win": 0,
-        "loss": 0
-    };
+    const results = { "win": 0, "loss": 0 };
 
     for (let i = 0; i < commonGames.length; i++) {
         showStatus(`Checking ${i + 1} out of ${commonGames.length} games`);
@@ -173,13 +187,21 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
             continue;
         }
 
+        const queueId = getQueueId(matchDTO);
+
+        if (!(queueId in results)) {
+            results[queueId] = { "win": 0, "loss": 0 };
+        }
+
         const win = checkWin(matchDTO, teamId);
 
         if (win) {
             results.win++;
+            results[queueId].win++;
             console.log("win");
         } else {
             results.loss++;
+            results[queueId].loss++;
             console.log("loss");
         }
 
