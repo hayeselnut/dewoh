@@ -6,6 +6,9 @@ const WIN = 1;
 const LOSE = 0;
 const VS = -1;
 
+const BLUE = 100;
+const RED = 200;
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -131,25 +134,59 @@ async function getGameIds(region, accountId, timestamp) {
     return gameIds;
 }
 
-function isSameTeam(matchDTO, id1, id2) {
+// Checks if the two players are on the same team (they could be vsing each other!)
+function getTeamId(matchDTO, id1, id2) {
+    const participantId1 = matchDTO.participantIdentities.filter(p => p.player.currentAccountId === id1)[0].participantId;
+    const participantId2 = matchDTO.participantIdentities.filter(p => p.player.currentAccountId === id2)[0].participantId;
 
+    const team1 = matchDTO.participants[participantId1 - 1].teamId;
+    const team2 = matchDTO.participants[participantId2 - 1].teamId;
+
+    if (team1 === team2) {
+        return team1;
+    }
+
+    return VS;
+}
+
+// Checks if the given team is won the game
+function checkWin(matchDTO, teamId) {
+    return matchDTO.teams.filter(t => t.teamId === teamId)[0].win == "Win";
 }
 
 async function getGameOutcomes(commonGames, region, id1, id2) {
     // WHEN I GET BETTER API LIMITS: const commonMatchDTOs = await Promise.all(commonGames.map(m => getMatchDTO(region, m)));
 
-    const gameResults = {
+    const results = {
         "win": 0,
         "loss": 0
     };
 
-    commonGames.foreach(gameId => {
+    for (let i = 0; i < commonGames.length; i++) {
+        showStatus(`Checking ${i + 1} out of ${commonGames.length} games`);
+        const gameId = commonGames[i];
         const matchDTO = await getMatchDTO(region, gameId);
+        const teamId = getTeamId(matchDTO, id1, id2);
 
-        
+        if (teamId == VS) {
+            console.log("vsed each other");
+            continue;
+        }
+
+        const win = checkWin(matchDTO, teamId);
+
+        if (win) {
+            results.win++;
+            console.log("win");
+        } else {
+            results.loss++;
+            console.log("loss");
+        }
 
         await sleep(1000);
-    });
+    }
+
+    return results;
 }
 
 $("input").on("focus", function() {
@@ -191,9 +228,20 @@ $("#dewoh-btn").on("click", async () => {
     const games2 = await getGameIds(region, id2, timestamp);
 
     const commonGames = getIntersection(games1, games2);
-    showStatus(`Checking ${commonGames.length} common games...`);
 
-    console.log("COMMON GAMES", commonGames);
+    if (commonGames.length) {
+        showStatus(`Checking ${commonGames.length} common games...`);
 
-    getGameOutcomes(commonGames, region, id1, id2);
+        console.log("COMMON GAMES", commonGames);
+
+        const results = await getGameOutcomes(commonGames, region, id1, id2);
+
+        showStatus("Results are as follows:");
+
+        showStatus(JSON.stringify(results));
+
+    } else {
+        showStatus("No common games found this year");
+    }
+
 });
