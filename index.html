@@ -6,10 +6,18 @@
         <title>Dewoh</title>
         <link rel="icon" href="assets/logo_black.svg">
         <link rel="stylesheet" href="hayeselnut.github.io/styles.css">
+        <style>
+            #dewoh-cover {
+                background-image: url("./assets/bg.jpg");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+        </style>
     </head>
 
     <body class="open-sans">
-        <header>
+        <header id="dewoh-cover">
             <nav>
                 <ul>
                     <li><a href="https://hayeselnut.github.io" class="roboto-mono">Home</a></li>
@@ -65,7 +73,7 @@
             </p>
 
             <p>
-                DATABASE: Firebase
+                DATABASE: Firebase <----- hahaha no more
             </p>
             <p>
                 PROXY: AWS Lambdas and AWS API Gateway since Riot Games API enforces server-to-server communications.
@@ -73,6 +81,7 @@
         </section>
 
         <section class="results" id="dewoh-results">
+            <div id="status"></div>
             <div id="summoner-metadata">
                 <!-- SUMMONER ICONS AND LEVELS -->
             </div>
@@ -86,7 +95,7 @@
         </footer>
 
         <!-- The core Firebase JS SDK is always required and must be listed first -->
-        <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
+        <!-- <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-database.js"></script>
         <script src="https://www.gstatic.com/firebasejs/7.19.0/firebase-analytics.js"></script>
 
@@ -106,7 +115,7 @@
             // Initialize Firebase
             firebase.initializeApp(firebaseConfig);
             firebase.analytics();
-        </script>
+        </script> -->
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="main.js"></script>
