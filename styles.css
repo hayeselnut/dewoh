@@ -1,21 +1,45 @@
 /* DEWOH SPECIFIC ELEMENTS */
 
-/* DEWOH */
-
-#match-history {
-    justify-content: flex-start;
-    text-align: center;
+#dewoh-btn{
+    padding: 10px 30px;
+    text-transform: uppercase;
+}
+#dewoh-region {
+    padding: 10px 10px;
+    text-transform: uppercase;
 }
 
-#match-history .match {
-    margin: 5px;
-    padding: 5px;
-
-    background-color: lightgrey;
-    width: 20%;
+#dewoh-btn,
+#dewoh-region {
+    color: #CDBE91;
+    background-color: #1E2328;
+    border: 2px solid #A27D30;
 }
-#match-history .win  { background-color: lightblue;  }
-#match-history .loss { background-color: lightcoral; }
+
+#dewoh-btn:hover {
+    box-shadow: 0px 0px 3px #CCA34C;
+}
+
+#dewoh-btn:hover,
+#dewoh-region:hover {
+    color: #F0E6D2;
+    background-color: #2D2F2F;
+    border-color: #CCA34C;
+
+    cursor: pointer;
+}
+#dewoh-btn:active {
+    color: #785A28;
+    background-color: #1E2328;
+    border-color: #5A441D;
+}
+
+#dewoh-region option {
+  background-color: #010A13;
+}
+#dewoh-region option:checked {
+  background-color: #1E2328;
+}
 
 #summoner-metadata {
     justify-content: space-around;
@@ -35,4 +59,24 @@
 
 #overall {
     margin-bottom: 50px;
+}
+
+#match-history {
+    justify-content: center;
+}
+
+#match-history .match {
+    margin: 5px;
+    padding: 5px;
+
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: 50%;
+}
+#match-history .win  { background-color: lightblue;  }
+#match-history .loss { background-color: lightcoral; }
+#match-history .match img {
+    width: 2em;
+    /* IS THIS UNIT CORRECT ^^^ */
+    margin: 5px;
 }

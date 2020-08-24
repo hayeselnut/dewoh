@@ -1,8 +1,8 @@
 "use strict";
 
-let latestVersion;
-
+let LATEST_VERSION;
 let QUEUES;
+let CHAMPIONS = {};
 
 const WIN = 1;
 const LOSE = 0;
@@ -28,23 +28,44 @@ function showStatus(statusMessage) {
     });
 }
 
+function getChampions() {
+    return $.ajax({
+        type: "GET",
+        url: `https://ddragon.leagueoflegends.com/cdn/${LATEST_VERSION}/data/en_US/champion.json`,
+        success: response => {
+            Object.keys(response.data).forEach(key => {
+                const championId = response.data[key].key;
+                CHAMPIONS[championId] = response.data[key].id;
+            })
 
+            console.log("received champs", CHAMPIONS);
+        }, error: err => {
+            console.log("err get champs", err);
+        }
+    });
+}
+
+function getChampionURL(championId) {
+    const championName = CHAMPIONS[championId];
+
+    return `https://ddragon.leagueoflegends.com/cdn/${LATEST_VERSION}/img/champion/${championName}.png`;
+}
 
 function getLatestVersion() {
-    $.ajax({
+    return $.ajax({
         type: "GET",
         url: "https://ddragon.leagueoflegends.com/api/versions.json",
         success: response => {
-            latestVersion = response[0];
-            console.log("LATEST V", latestVersion);
+            LATEST_VERSION = response[0];
+            console.log("LATEST V", LATEST_VERSION);
         }, error: () => {
-            latestVersion = "10.16.1";
+            LATEST_VERSION = "10.16.1";
         }
     });
 }
 
 function getQueues() {
-    $.ajax({
+    return $.ajax({
         type: "GET",
         url: "https://hayeselnut.github.io/dewoh/queues.json",
         success: response => {
@@ -61,9 +82,10 @@ function getQueueName(queueId) {
     return QUEUES.filter(q => q.queueId == queueId)[0].description;
 }
 
-$(document).ready(() => {
-    getLatestVersion();
+$(document).ready(async () => {
     getQueues();
+    await getLatestVersion();
+    getChampions();
 });
 
 function getSummonerDTO(region, name) {
@@ -109,6 +131,7 @@ function getMatchDTO(region, gameId) {
 function showSummonerMetadata(summonerDTO) {
     const name = summonerDTO.name;
     const summonerIcon = summonerDTO.profileIconId;
+    const summonerIconURL = `https://ddragon.leagueoflegends.com/cdn/${LATEST_VERSION}/img/profileicon/${summonerIcon}.png`;
     const level = summonerDTO.summonerLevel;
 
     $("#dewoh-results").css("display", "block").css("visibility", "hidden");
@@ -118,7 +141,7 @@ function showSummonerMetadata(summonerDTO) {
 
     let append = `
         <div class="flexbox">
-            <img src="https://ddragon.leagueoflegends.com/cdn/${latestVersion}/img/profileicon/${summonerIcon}.png"</img>
+            <img src="${summonerIconURL}"</img>
             <div>
                 <h2>${name}</h2>
                 <p>Level ${level}</p>
@@ -192,20 +215,49 @@ function checkWin(matchDTO, teamId) {
     return matchDTO.teams.filter(t => t.teamId === teamId)[0].win == "Win";
 }
 
-function showMatch(participantName1, participantName2, win, queueId, teamId) {
-    const winMessage = win ? "WIN" : "LOSS";
-    const winClass = win ? "win" : "loss";
-    const teamMessage = teamId == BLUE ? "Blue team" : "Red team";
+function showMatch(matchDTO, id1, id2) {
+    const participantName1 = getParticipantName(matchDTO, id1);
+    const participantName2 = getParticipantName(matchDTO, id2);
+
+    const championId1 = getChampionId(matchDTO, id1);
+    const championId2 = getChampionId(matchDTO, id2);
+    const championURL1 = getChampionURL(championId1);
+    const championURL2 = getChampionURL(championId2);
+
+    const queueId = getQueueId(matchDTO);
     const queueDesc = getQueueName(queueId);
 
+    const teamId = getTeamId(matchDTO, id1, id2);
+    const teamMessage = teamId == BLUE ? "Blue team" : "Red team";
+
+    const win = checkWin(matchDTO, teamId);
+    const winMessage = win ? "WIN" : "LOSS";
+    const winClass = win ? "win" : "loss";
+
     const card = `
-        <div class="match ${winClass}">
-            <p><strong>${participantName1}</strong><br/><strong>${participantName2}</strong></p>
-            <p>${winMessage}<br/>${teamMessage}<br/>${queueDesc}</p>
+        <div class="match flexbox ${winClass}">
+            <img src="${championURL1}"/><img src="${championURL2}"/>
+            <strong>${queueDesc}</strong>
         </div>
     `;
 
+    // const card = `
+    //     <div class="match ${winClass}">
+    //         <img src="${championURL1}"/><strong>${participantName1}</strong>
+    //         <img src="${championURL2}"/><strong>${participantName2}</strong>
+    //         ${winMessage} ${teamMessage} ${queueDesc}
+    //     </div>
+    // `;
+
+
+
     $("#match-history").append(card);
+}
+
+// Gets the champion a summoner played during the match
+function getChampionId(matchDTO, id) {
+    const participantId = matchDTO.participantIdentities.filter(p => p.player.currentAccountId === id)[0].participantId;
+    return matchDTO.participants[participantId - 1].championId;
 }
 
 // Gets participants summoner name at the time of the match (they could have changed their summoner name)
@@ -226,6 +278,7 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
 
     for (let i = 0; i < commonGames.length; i++) {
         showStatus(`Checking ${i + 1} out of ${commonGames.length} games`);
+
         const gameId = commonGames[i];
         const matchDTO = await getMatchDTO(region, gameId);
         const teamId = getTeamId(matchDTO, id1, id2);
@@ -235,10 +288,10 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
             continue;
         }
 
+        showMatch(matchDTO, id1, id2);
         const win = checkWin(matchDTO, teamId);
         const queueId = getQueueId(matchDTO);
-        const participantName1 = getParticipantName(matchDTO, id1);
-        const participantName2 = getParticipantName(matchDTO, id2);
+
 
         if (!(queueId in results.byQueue)) {
             results.byQueue[queueId] = { "win": 0, "loss": 0 };
@@ -253,8 +306,6 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
             results.byQueue[queueId].loss++;
             console.log("loss", results);
         }
-
-        showMatch(participantName1, participantName2, win, queueId, teamId)
 
         await sleep(1000);
     }
@@ -312,10 +363,27 @@ function clickButton(event) {
 $("#sum1-txtbox").on("keydown", clickButton);
 $("#sum2-txtbox").on("keydown", clickButton);
 
+
+function emptyResults() {
+    // TODO: could probably write a recursive function that goes through all children
+    $("#summoner-metadata").empty();
+
+    $("#analysis").slideUp(500, () => {
+        $("#overall").empty();
+        $("#by-queue").empty();
+        $("#by-role").empty();
+        $("#by-champion").empty();
+    }).slideDown(500);
+
+    $("#match-history").slideUp(500).empty().slideDown(500);
+
+}
+
 // NEED TO MAKE SURE NO DOUBLE CLICK BUTTON (disable button?)
 $("#dewoh-btn").on("click", async function() {
     $(this).prop("disabled", true);
-    const region = $("#region").val();
+    emptyResults();
+    const region = $("#dewoh-region").val();
     const name1 = transformSummonerName($("#sum1-txtbox").val());
     const name2 = transformSummonerName($("#sum2-txtbox").val());
 
