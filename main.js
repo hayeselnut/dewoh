@@ -192,6 +192,27 @@ function checkWin(matchDTO, teamId) {
     return matchDTO.teams.filter(t => t.teamId === teamId)[0].win == "Win";
 }
 
+function showMatch(participantName1, participantName2, win, queueId, teamId) {
+    const winMessage = win ? "WIN" : "LOSS";
+    const winClass = win ? "win" : "loss";
+    const teamMessage = teamId == BLUE ? "Blue team" : "Red team";
+    const queueDesc = getQueueName(queueId);
+
+    const card = `
+        <div class="match ${winClass}">
+            <p><strong>${participantName1}</strong><br/><strong>${participantName2}</strong></p>
+            <p>${winMessage}<br/>${teamMessage}<br/>${queueDesc}</p>
+        </div>
+    `;
+
+    $("#match-history").append(card);
+}
+
+// Gets participants summoner name at the time of the match (they could have changed their summoner name)
+function getParticipantName(matchDTO, id) {
+    return matchDTO.participantIdentities.filter(p => p.player.currentAccountId === id).map(p => p.player.summonerName)[0];
+}
+
 async function getGameOutcomes(commonGames, region, id1, id2) {
     // WHEN I GET BETTER API LIMITS: const commonMatchDTOs = await Promise.all(commonGames.map(m => getMatchDTO(region, m)));
 
@@ -214,13 +235,14 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
             continue;
         }
 
+        const win = checkWin(matchDTO, teamId);
         const queueId = getQueueId(matchDTO);
+        const participantName1 = getParticipantName(matchDTO, id1);
+        const participantName2 = getParticipantName(matchDTO, id2);
 
         if (!(queueId in results.byQueue)) {
             results.byQueue[queueId] = { "win": 0, "loss": 0 };
         }
-
-        const win = checkWin(matchDTO, teamId);
 
         if (win) {
             results.win++;
@@ -231,6 +253,8 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
             results.byQueue[queueId].loss++;
             console.log("loss", results);
         }
+
+        showMatch(participantName1, participantName2, win, queueId, teamId)
 
         await sleep(1000);
     }
