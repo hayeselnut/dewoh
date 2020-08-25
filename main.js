@@ -19,6 +19,23 @@ function getIntersection(arr1, arr2) {
     return arr1.filter(value => arr2.includes(value));
 }
 
+function convertUnixTimestamp(timestamp) {
+    const date = new Date(timestamp);
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    const year = date.getFullYear();
+    const month = months[date.getMonth()];
+    const day = date.getDate();
+    let hour = date.getHours();
+    let min = date.getMinutes();
+    const apm = hour < 12 || hour === 24 ? "AM" : "PM";
+    if (min < 10) min = "0" + min;
+    hour = hour % 12 || 12;
+
+    return `${day} ${month} ${year} ${hour}:${min} ${apm}`;
+
+}
+
 function showStatus(statusMessage) {
     const duration = 500;
     const style = "h3"
@@ -26,6 +43,15 @@ function showStatus(statusMessage) {
     $("#status").fadeOut(duration, () => {
         $("#status").html(`<${style}>${statusMessage}</${style}>`).fadeIn(duration);
     });
+}
+
+function getSpanClass(winRate) {
+    if (winRate >= 80) return "best";
+    if (winRate >= 65) return "better";
+    if (winRate >= 50) return "good";
+    if (winRate >= 35) return "bad";
+    if (winRate >= 20) return "worse";
+    return "worst"
 }
 
 function getChampions() {
@@ -82,6 +108,11 @@ function getQueueName(queueId) {
     return QUEUES.filter(q => q.queueId == queueId)[0].description;
 }
 
+function getQueueMap(queueId) {
+    // Using == instead of === beause queueId will be passed as a string
+    return QUEUES.filter(q => q.queueId == queueId)[0].map;
+}
+
 $(document).ready(async () => {
     getQueues();
     await getLatestVersion();
@@ -123,6 +154,10 @@ function getMatchDTO(region, gameId) {
             return response;
         }, error: err => {
             console.log("err get match", err);
+            if (err.status === 504) {
+                console.log("retrying...");
+                return getMatchDTO(region, gameId);
+            }
             // TODO: HANDLE THIS (e.g. invalid gameiD? is that even possible)
         }
     });
@@ -215,6 +250,32 @@ function checkWin(matchDTO, teamId) {
     return matchDTO.teams.filter(t => t.teamId === teamId)[0].win == "Win";
 }
 
+function getTime(matchDTO) {
+    return matchDTO.gameCreation;
+}
+
+function showVsMatch(matchDTO, id1, id2) {
+    const championId1 = getChampionId(matchDTO, id1);
+    const championId2 = getChampionId(matchDTO, id2);
+    const championURL1 = getChampionURL(championId1);
+    const championURL2 = getChampionURL(championId2);
+
+    const queueId = getQueueId(matchDTO);
+    const queueDesc = getQueueName(queueId);
+
+    const timePlayed = convertUnixTimestamp(getTime(matchDTO));
+
+    const card = `
+        <div class="match flexbox vs">
+            <img class="champion" src="${championURL1}"/> vs <img class="champion" src="${championURL2}"/>
+            <strong>${queueDesc}</strong>
+            <text class="date">${timePlayed}</text>
+        </div>
+    `;
+
+    $("#match-history").append(card);
+}
+
 function showMatch(matchDTO, id1, id2) {
     const participantName1 = getParticipantName(matchDTO, id1);
     const participantName2 = getParticipantName(matchDTO, id2);
@@ -231,25 +292,18 @@ function showMatch(matchDTO, id1, id2) {
     const teamMessage = teamId == BLUE ? "Blue team" : "Red team";
 
     const win = checkWin(matchDTO, teamId);
-    const winMessage = win ? "WIN" : "LOSS";
     const winClass = win ? "win" : "loss";
+    const winMessage = winClass.toUpperCase();
+
+    const timePlayed = convertUnixTimestamp(getTime(matchDTO));
 
     const card = `
         <div class="match flexbox ${winClass}">
-            <img src="${championURL1}"/><img src="${championURL2}"/>
+            <img class="champion" src="${championURL1}"/><img class="champion" src="${championURL2}"/>
             <strong>${queueDesc}</strong>
+            <text class="date">${timePlayed}</text>
         </div>
     `;
-
-    // const card = `
-    //     <div class="match ${winClass}">
-    //         <img src="${championURL1}"/><strong>${participantName1}</strong>
-    //         <img src="${championURL2}"/><strong>${participantName2}</strong>
-    //         ${winMessage} ${teamMessage} ${queueDesc}
-    //     </div>
-    // `;
-
-
 
     $("#match-history").append(card);
 }
@@ -263,6 +317,27 @@ function getChampionId(matchDTO, id) {
 // Gets participants summoner name at the time of the match (they could have changed their summoner name)
 function getParticipantName(matchDTO, id) {
     return matchDTO.participantIdentities.filter(p => p.player.currentAccountId === id).map(p => p.player.summonerName)[0];
+}
+
+function getRole(matchDTO, id) {
+    // will have to implement https://github.com/meraki-analytics/role-identification later in the future
+    const participantId = matchDTO.participantIdentities.filter(p => p.player.currentAccountId === id)[0].participantId;
+    const role = matchDTO.participants[participantId - 1].timeline.role;
+    const lane = matchDTO.participants[participantId - 1].timeline.lane;
+
+    if (lane === "TOP" && role === "SOLO") return "TOP";
+    if (lane === "JUNGLE") return "JUNGLE";
+    if (lane === "MIDDLE" && role === "SOLO") return "MID";
+
+    if (lane === "BOTTOM" && role === "DUO_CARRY") return "ADC";
+    if (lane === "BOTTOM" && role === "DUO_SUPPORT") return "SUPPORT";
+
+    // Weird cases?
+    if (role === "DUO") return "ADC"
+    if (role === "DUO_SUPPORT") return "SUPPORT";
+    if (lane === "BOTTOM" && role === "SOLO") return "ADC";
+
+    return role + "/" + lane;
 }
 
 async function getGameOutcomes(commonGames, region, id1, id2) {
@@ -283,31 +358,47 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
         const matchDTO = await getMatchDTO(region, gameId);
         const teamId = getTeamId(matchDTO, id1, id2);
 
-        if (teamId == VS) {
-            console.log("vsed each other");
+        if (teamId === VS) {
+            showVsMatch(matchDTO, id1, id2);
+            console.log("vsed each other", matchDTO);
             continue;
         }
 
         showMatch(matchDTO, id1, id2);
-        const win = checkWin(matchDTO, teamId);
+        const win = checkWin(matchDTO, teamId) ? "win" : "loss";
         const queueId = getQueueId(matchDTO);
-
+        const map = getQueueMap(queueId);
+        const role1 = getRole(matchDTO, id1);
+        const role2 = getRole(matchDTO, id2);
+        const champion1 = getChampionId(matchDTO, id1);
+        const champion2 = getChampionId(matchDTO, id2);
+        const duoChampions = champion1 + " " + champion2;
 
         if (!(queueId in results.byQueue)) {
             results.byQueue[queueId] = { "win": 0, "loss": 0 };
         }
 
-        if (win) {
-            results.win++;
-            results.byQueue[queueId].win++;
-            console.log("win", results);
-        } else {
-            results.loss++;
-            results.byQueue[queueId].loss++;
-            console.log("loss", results);
+        if (!(duoChampions in results.byChampion)) {
+            results.byChampion[duoChampions] = { "win": 0, "loss": 0 };
         }
 
-        await sleep(1000);
+        if (map === "Summoner's Rift") {
+            // Add role statistic
+            const duoRole = role1 + " " + role2;
+
+            if (!(duoRole in results.byRole)) {
+                results.byRole[duoRole] = { "win": 0, "loss": 0 };
+            }
+
+            results.byRole[duoRole][win]++;
+        }
+
+        results[win]++;
+        results.byQueue[queueId][win]++;
+        results.byChampion[duoChampions][win]++;
+        console.log(win, gameId, role1, role2);
+
+        await sleep(1200);
     }
 
     return results;
@@ -328,29 +419,78 @@ function showResults(results) {
     const totalGames = results.win + results.loss;
     const totalWins = results.win;
     const totalWinRate = (100.0 * totalWins / totalGames).toFixed(2);
+    const spanClass = getSpanClass(totalWinRate);
 
     $("#overall").html(`
-        <h2>Overall win rate: ${totalWinRate}%</h2>
+        <h2>Overall win rate: <span class="${spanClass}">${totalWinRate}%</span></h2>
         <p>${totalWins} games won out of ${totalGames} games played</p>
     `);
 
     // Show by queue
-    let qAnalaysis = "";
+    let qAnalaysis = "<h3>Queue breakdown:</h3>";
     for (const [qId, qResults] of Object.entries(results.byQueue)) {
         console.log("CHECKING QUEUE", qId, qResults);
         const qGames = qResults.win + qResults.loss;
         const qWins = qResults.win;
         const qWinRate = (100.0 * qWins / qGames).toFixed(2);
+        const spanClass = getSpanClass(qWinRate);
 
         const qDesc = getQueueName(qId);
 
-        qAnalaysis += `<p><strong>${qDesc} - ${qWinRate}%</strong><br/>${qWins} / ${qGames} games won</p>`;
-      }
-
-      $("#by-queue").html(qAnalaysis);
+        qAnalaysis += `
+            <p>
+                <strong>${qDesc} - <span class="${spanClass}">${qWinRate}%</span></strong>
+                <br/>
+                ${qWins} / ${qGames} games won
+            </p>
+        `;
+    }
+    $("#by-queue").html(qAnalaysis);
 
     // Show by roles
+    // TODO: sort based on win rate, then #games played
+    let rAnalysis = "<h3>Role breakdown:</h3>";
+    for (const [duoRoles, rResults] of Object.entries(results.byRole)) {
+        console.log("CHECKING ROLES", duoRoles, rResults);
+        const rGames = rResults.win + rResults.loss;
+        const rWins = rResults.win;
+        const rWinRate = (100.0 * rWins / rGames).toFixed(2);
+        const spanClass = getSpanClass(rWinRate);
+
+        const [role1, role2] = duoRoles.split(" ");
+
+        rAnalysis += `
+            <p>
+                <strong>${role1} / ${role2} - <span class="${spanClass}">${rWinRate}%</span></strong>
+                <br/>
+                ${rWins} / ${rGames} games won
+            </p>
+        `;
+    }
+    $("#by-role").html(rAnalysis);
+
     // Show by champion
+    let cAnalysis = "<h3>Champion breakdown:</h3>";
+    for (const [duoChampions, cResults] of Object.entries(results.byChampion)) {
+        console.log("CHECKING CHAMPIONS", duoChampions, cResults);
+        const cGames = cResults.win + cResults.loss;
+        const cWins = cResults.win;
+        const cWinRate = (100.0 * cWins / cGames).toFixed(2);
+        const spanClass = getSpanClass(cWinRate);
+
+        const [champion1, champion2] = duoChampions.split(" ");
+        const championURL1 = getChampionURL(champion1);
+        const championURL2 = getChampionURL(champion2);
+
+        cAnalysis += `
+            <p>
+                <img class="champion" src="${championURL1}"/><img class="champion" src="${championURL2}"/><strong> - <span class="${spanClass}">${cWinRate}%</span></strong>
+                <br/>
+                ${cWins} / ${cGames} games won
+            </p>
+        `;
+    }
+    $("#by-champion").html(cAnalysis);
 }
 
 
@@ -413,7 +553,7 @@ $("#dewoh-btn").on("click", async function() {
     const id1 = await getSummonerId(region, name1);
     const id2 = await getSummonerId(region, name2);
 
-    // Promise.all([id1, id2]); // Async for both ids
+    // Promise.all([id1, id2]); // TODO: Async for both ids
 
     let timestamp = 1577836800 * 1000;
 

@@ -50,16 +50,41 @@
 #summoner-metadata p {
     margin: 0;
 }
-
+#summoner-metadata .flexbox {
+    width: 50%;
+    justify-content: flex-start;
+}
+#summoner-metadata {
+    justify-content: center;
+}
+#summoner-metadata .flexbox:first-child {
+    flex-direction: row-reverse;
+}
+#summoner-metadata .flexbox:first-child p {
+    text-align: right;
+}
 #summoner-metadata img {
-    width: 100px;
-    margin: 20px;
+    width: 150px;
+    margin: 0px 40px;
     box-shadow: 0px 0px 5px black;
+}
+
+#analysis {
+    align-items: flex-start;
+    justify-content: space-around;
 }
 
 #overall {
     margin-bottom: 50px;
+    text-align: center;
 }
+
+span.best { color: royalblue; }
+span.better { color: skyblue; }
+span.good { color: mediumseagreen; }
+span.bad  { color: darkorange; }
+span.worse { color: red; }
+span.worst  { color: darkslategrey; }
 
 #match-history {
     justify-content: center;
@@ -75,8 +100,17 @@
 }
 #match-history .win  { background-color: lightblue;  }
 #match-history .loss { background-color: lightcoral; }
-#match-history .match img {
+#match-history .vs   { background-color: grey;       }
+img.champion {
     width: 2em;
+    margin-right: 10px;
     /* IS THIS UNIT CORRECT ^^^ */
+}
+#match-history img.champion {
     margin: 5px;
+}
+#match-history text.date {
+    font-size: 12px;
+    margin-left: auto;
+    margin-right: 5px;
 }
