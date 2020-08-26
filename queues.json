@@ -462,6 +462,12 @@
         "notes": "Deprecated in patch 9.2"
     },
     {
+        "queueId": 1300,
+        "map": "Nexus Blitz",
+        "description": "Nexus Blitz games",
+        "notes": null
+    },
+    {
         "queueId": 2000,
         "map": "Summoner's Rift",
         "description": "Tutorial 1",

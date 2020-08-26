@@ -105,12 +105,9 @@ function getQueues() {
 
 function getQueueName(queueId) {
     // Using == instead of === beause queueId will be passed as a string
+    if (QUEUES.filter(q => q.queueId == queueId)[0] === undefined) return "undefined";
     return QUEUES.filter(q => q.queueId == queueId)[0].description;
-}
-
-function getQueueMap(queueId) {
-    // Using == instead of === beause queueId will be passed as a string
-    return QUEUES.filter(q => q.queueId == queueId)[0].map;
+    // return QUEUES[queueId].name;
 }
 
 $(document).ready(async () => {
@@ -140,7 +137,6 @@ function getMatchlistDTO(region, accountId, index) {
             return response;
         }, error: err => {
             console.log("err get matchlist", err);
-            // TODO: when matchlist hit error (maybe over index?)
         }
     });
 }
@@ -163,44 +159,55 @@ function getMatchDTO(region, gameId) {
     });
 }
 
-function showSummonerMetadata(summonerDTO) {
-    const name = summonerDTO.name;
-    const summonerIcon = summonerDTO.profileIconId;
-    const summonerIconURL = `https://ddragon.leagueoflegends.com/cdn/${LATEST_VERSION}/img/profileicon/${summonerIcon}.png`;
-    const level = summonerDTO.summonerLevel;
+function showSummonerMetadata(summonerDTO1, summonerDTO2) {
+    const name1 = summonerDTO1.name;
+    const name2 = summonerDTO2.name;
+    const summonerIcon1 = summonerDTO1.profileIconId;
+    const summonerIcon2 = summonerDTO2.profileIconId;
+    const summonerIconURL1 = `https://ddragon.leagueoflegends.com/cdn/${LATEST_VERSION}/img/profileicon/${summonerIcon1}.png`;
+    const summonerIconURL2 = `https://ddragon.leagueoflegends.com/cdn/${LATEST_VERSION}/img/profileicon/${summonerIcon2}.png`;
+    const level1 = summonerDTO1.summonerLevel;
+    const level2 = summonerDTO2.summonerLevel;
 
     $("#dewoh-results").css("display", "block").css("visibility", "hidden");
     $("#dewoh-desc").slideUp(500, () => {
         $("#dewoh-results").css("visibility", "visible").fadeIn(500);
     });
 
-    let append = `
+    let metadata = `
         <div class="flexbox">
-            <img src="${summonerIconURL}"</img>
+            <img src="${summonerIconURL1}"</img>
             <div>
-                <h2>${name}</h2>
-                <p>Level ${level}</p>
+                <h2>${name1}</h2>
+                <p>Level ${level1}</p>
+            </div>
+        </div>
+        <div class="flexbox">
+            <img src="${summonerIconURL2}"</img>
+            <div>
+                <h2>${name2}</h2>
+                <p>Level ${level2}</p>
             </div>
         </div>
     `;
-    $("#summoner-metadata").append(append);
+    $("#summoner-metadata").html(metadata);
 }
 
-async function getSummonerId(region, name) {
+async function getSummonerIds(region, name1, name2) {
 
     // Call API to find ID
-    const summonerDTO = await getSummonerDTO(region, name);
+    const [summonerDTO1, summonerDTO2] = await Promise.all([getSummonerDTO(region, name1), getSummonerDTO(region, name2)]);
 
-    if (!summonerDTO) {
+    if (!summonerDTO1 || !summonerDTO2) {
         console.log("summonerDTO dtected as null");
         return null;
     }
 
     // Show summoner information
-    showSummonerMetadata(summonerDTO);
+    showSummonerMetadata(summonerDTO1, summonerDTO2);
 
     // Return id
-    return summonerDTO.accountId;
+    return [summonerDTO1.accountId, summonerDTO2.accountId];
 
 }
 
@@ -209,13 +216,13 @@ async function getGameIds(region, accountId, timestamp) {
     let matchlistDTO = await getMatchlistDTO(region, accountId, idx);
     let gameIds = matchlistDTO.matches.filter(m => m.timestamp > timestamp).map(m => m.gameId);
 
-    let keepLooking = gameIds.length == 100;
+    let keepLooking = gameIds.length === 100;
     while (keepLooking) {
         idx += 100;
 
         matchlistDTO = await getMatchlistDTO(region, accountId, idx);
         let moreGameIds = matchlistDTO.matches.filter(m => m.timestamp > timestamp).map(m => m.gameId);
-        keepLooking = moreGameIds.length == 100;
+        keepLooking = moreGameIds.length === 100;
 
         gameIds = gameIds.concat(moreGameIds);
 
@@ -367,22 +374,23 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
         showMatch(matchDTO, id1, id2);
         const win = checkWin(matchDTO, teamId) ? "win" : "loss";
         const queueId = getQueueId(matchDTO);
-        const map = getQueueMap(queueId);
+        const queueDesc = getQueueName(queueId);
         const role1 = getRole(matchDTO, id1);
         const role2 = getRole(matchDTO, id2);
         const champion1 = getChampionId(matchDTO, id1);
         const champion2 = getChampionId(matchDTO, id2);
-        const duoChampions = champion1 + " " + champion2;
 
-        if (!(queueId in results.byQueue)) {
-            results.byQueue[queueId] = { "win": 0, "loss": 0 };
+        if (champion1 !== champion2) {
+            const duoChampions = champion1 + " " + champion2;
+
+            if (!(duoChampions in results.byChampion)) {
+                results.byChampion[duoChampions] = { "win": 0, "loss": 0 };
+            }
+
+            results.byChampion[duoChampions][win]++;
         }
 
-        if (!(duoChampions in results.byChampion)) {
-            results.byChampion[duoChampions] = { "win": 0, "loss": 0 };
-        }
-
-        if (map === "Summoner's Rift") {
+        if (queueDesc.includes("5v5") && !queueDesc.includes("ARAM") || queueDesc.includes("Clash")) {
             // Add role statistic
             const duoRole = role1 + " " + role2;
 
@@ -393,12 +401,14 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
             results.byRole[duoRole][win]++;
         }
 
+        if (!(queueId in results.byQueue)) {
+            results.byQueue[queueId] = { "win": 0, "loss": 0 };
+        }
         results[win]++;
         results.byQueue[queueId][win]++;
-        results.byChampion[duoChampions][win]++;
         console.log(win, gameId, role1, role2);
 
-        await sleep(1200);
+        await sleep(2000);
     }
 
     return results;
@@ -412,6 +422,35 @@ function transformSummonerName(name) {
     return name.toLowerCase().split(" ").join("");
 }
 
+function sortResults(resultsDict, minGames) {
+    const resultsArray = [];
+
+    for (const [key, result] of Object.entries(resultsDict)) {
+        const games = result.win + result.loss;
+        if (games < minGames) continue;
+
+        const wins = result.win;
+        const winRate = (100.0 * wins / games).toFixed(2);
+
+        resultsArray.push({
+            "key": key,
+            "games": games,
+            "wins": wins,
+            "winRate": winRate,
+        })
+    }
+
+    resultsArray.sort((a, b) => {
+        if (a.games == b.games) {
+            return a.wins < b.wins ? 1 : -1;
+        }
+
+        return a.games < b.games ? 1 : -1;
+    });
+
+    return resultsArray;
+}
+
 function showResults(results) {
     console.log(results);
 
@@ -423,19 +462,18 @@ function showResults(results) {
 
     $("#overall").html(`
         <h2>Overall win rate: <span class="${spanClass}">${totalWinRate}%</span></h2>
-        <p>${totalWins} games won out of ${totalGames} games played</p>
+        <p>${totalWins} games won out of ${totalGames} games played together</p>
     `);
 
     // Show by queue
     let qAnalaysis = "<h3>Queue breakdown:</h3>";
-    for (const [qId, qResults] of Object.entries(results.byQueue)) {
-        console.log("CHECKING QUEUE", qId, qResults);
-        const qGames = qResults.win + qResults.loss;
-        const qWins = qResults.win;
-        const qWinRate = (100.0 * qWins / qGames).toFixed(2);
-        const spanClass = getSpanClass(qWinRate);
-
+    for (const qArray of sortResults(results.byQueue, 1)) {
+        const qId = qArray.key;
         const qDesc = getQueueName(qId);
+        const qGames = qArray.games;
+        const qWins = qArray.wins;
+        const qWinRate = qArray.winRate;
+        const spanClass = getSpanClass(qWinRate);
 
         qAnalaysis += `
             <p>
@@ -450,14 +488,15 @@ function showResults(results) {
     // Show by roles
     // TODO: sort based on win rate, then #games played
     let rAnalysis = "<h3>Role breakdown:</h3>";
-    for (const [duoRoles, rResults] of Object.entries(results.byRole)) {
-        console.log("CHECKING ROLES", duoRoles, rResults);
-        const rGames = rResults.win + rResults.loss;
-        const rWins = rResults.win;
-        const rWinRate = (100.0 * rWins / rGames).toFixed(2);
-        const spanClass = getSpanClass(rWinRate);
-
+    const sortedRoles = sortResults(results.byRole, 5);
+    for (let i = 0; i < sortedRoles.length && i < 10 || 5 <= i && i < 10 && sortedRoles[i].games >= 10; i++) {
+        const rArray = sortedRoles[i];
+        const duoRoles = rArray.key;
         const [role1, role2] = duoRoles.split(" ");
+        const rGames = rArray.games;
+        const rWins = rArray.wins;
+        const rWinRate = rArray.winRate;
+        const spanClass = getSpanClass(rWinRate);
 
         rAnalysis += `
             <p>
@@ -471,14 +510,16 @@ function showResults(results) {
 
     // Show by champion
     let cAnalysis = "<h3>Champion breakdown:</h3>";
-    for (const [duoChampions, cResults] of Object.entries(results.byChampion)) {
-        console.log("CHECKING CHAMPIONS", duoChampions, cResults);
-        const cGames = cResults.win + cResults.loss;
-        const cWins = cResults.win;
-        const cWinRate = (100.0 * cWins / cGames).toFixed(2);
+    const sortedChampions = sortResults(results.byChampion, 3);
+    for (let i = 0; i < sortedChampions.length && i < 10 || 5 <= i && i < 10 && sortedChampions[i].games >= 5; i++) {
+        const cArray = sortedChampions[i];
+        const duoChampions = cArray.key;
+        const [champion1, champion2] = duoChampions.split(" ");
+        const cGames = cArray.games;
+        const cWins = cArray.wins;
+        const cWinRate = cArray.winRate;
         const spanClass = getSpanClass(cWinRate);
 
-        const [champion1, champion2] = duoChampions.split(" ");
         const championURL1 = getChampionURL(champion1);
         const championURL2 = getChampionURL(champion2);
 
@@ -550,12 +591,14 @@ $("#dewoh-btn").on("click", async function() {
 
     $("#summoner-metadata").empty();
 
-    const id1 = await getSummonerId(region, name1);
-    const id2 = await getSummonerId(region, name2);
+    // const id1 = await getSummonerId(region, name1);
+    // const id2 = await getSummonerId(region, name2);
 
     // Promise.all([id1, id2]); // TODO: Async for both ids
+    const [id1, id2] = await getSummonerIds(region, name1, name2);
 
-    let timestamp = 1577836800 * 1000;
+    const timestamp = new Date().getTime() - $("#dewoh-timeframe").val();
+    console.log(timestamp);
 
     showStatus("Loading match histories...");
 
