@@ -408,7 +408,7 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
         results.byQueue[queueId][win]++;
         console.log(win, gameId, role1, role2);
 
-        await sleep(2000);
+        await sleep(0.05);
     }
 
     return results;
