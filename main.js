@@ -37,7 +37,7 @@ function convertUnixTimestamp(timestamp) {
 }
 
 function showStatus(statusMessage) {
-    const duration = 500;
+    const duration = 5;
     const style = "h3"
 
     $("#status").fadeOut(duration, () => {
