@@ -349,7 +349,7 @@ function getRole(matchDTO, id) {
 
 async function getGameOutcomes(commonGames, region, id1, id2) {
     // WHEN I GET BETTER API LIMITS:
-    const commonMatchDTOs = await Promise.all(commonGames.map(m => getMatchDTO(region, m)));
+    // const commonMatchDTOs = await Promise.all(commonGames.map(m => getMatchDTO(region, m)));
 
     const results = {
         "win": 0,
@@ -363,8 +363,8 @@ async function getGameOutcomes(commonGames, region, id1, id2) {
         showStatus(`Checking ${i + 1} out of ${commonGames.length} games`);
 
         const gameId = commonGames[i];
-        // const matchDTO = await getMatchDTO(region, gameId);
-        const matchDTO = commonMatchDTOs[i];
+        const matchDTO = await getMatchDTO(region, gameId);
+        // const matchDTO = commonMatchDTOs[i];
         const teamId = getTeamId(matchDTO, id1, id2);
 
         if (teamId === VS) {
