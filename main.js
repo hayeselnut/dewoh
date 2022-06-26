@@ -129,10 +129,10 @@ function getSummonerDTO(region, name) {
     });
 }
 
-function getMatchlistDTO(region, accountId, index) {
+function getMatchlistDTO(region, puuid, index) {
     return $.ajax({
         type: "GET",
-        url: `https://dkwuj1k34l.execute-api.us-east-2.amazonaws.com/rgapi/matchlist/${region}/${accountId}/${index}`,
+        url: `https://dkwuj1k34l.execute-api.us-east-2.amazonaws.com/rgapi/matchlist/${region}/${puuid}/${index}`,
         success: response => {
             return response;
         }, error: err => {
@@ -207,21 +207,21 @@ async function getSummonerIds(region, name1, name2) {
     showSummonerMetadata(summonerDTO1, summonerDTO2);
 
     // Return id
-    return [summonerDTO1.accountId, summonerDTO2.accountId];
+    return [summonerDTO1.puuid, summonerDTO2.puuid];
 
 }
 
-async function getGameIds(region, accountId, timestamp) {
+async function getGameIds(region, puuid, timestamp) {
     let idx = 0;
-    let matchlistDTO = await getMatchlistDTO(region, accountId, idx);
-    let gameIds = matchlistDTO.matches.filter(m => m.timestamp > timestamp).map(m => m.gameId);
+    let matchlistDTO = await getMatchlistDTO(region, puuid, idx);
+    let gameIds = matchlistDTO.matches.filter(m => m.timestamp > timestamp).map(m => m.matchId);
 
     let keepLooking = gameIds.length === 100;
     while (keepLooking) {
         idx += 100;
 
-        matchlistDTO = await getMatchlistDTO(region, accountId, idx);
-        let moreGameIds = matchlistDTO.matches.filter(m => m.timestamp > timestamp).map(m => m.gameId);
+        matchlistDTO = await getMatchlistDTO(region, puuid, idx);
+        let moreGameIds = matchlistDTO.matches.filter(m => m.timestamp > timestamp).map(m => m.matchId);
         keepLooking = moreGameIds.length === 100;
 
         gameIds = gameIds.concat(moreGameIds);
