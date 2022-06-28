@@ -1,0 +1,114 @@
+/* DEWOH SPECIFIC ELEMENTS */
+
+#dewoh-btn{
+    padding: 10px 30px;
+    text-transform: uppercase;
+}
+.input select {
+    padding: 10px 10px;
+}
+
+#dewoh-btn,
+.input select {
+    color: #CDBE91;
+    background-color: #1E2328;
+    border: 2px solid #A27D30;
+    margin: 5px;
+}
+#dewoh-btn:hover,
+.input select:hover {
+    color: #F0E6D2;
+    background-color: #2D2F2F;
+    border-color: #CCA34C;
+
+    cursor: pointer;
+}
+#dewoh-btn:hover {
+    box-shadow: 0px 0px 3px #CCA34C;
+}
+#dewoh-btn:active {
+    color: #785A28;
+    background-color: #1E2328;
+    border-color: #5A441D;
+}
+
+.input option {
+  background-color: #010A13;
+}
+.input option:checked {
+  background-color: #1E2328;
+}
+
+#summoner-metadata {
+    justify-content: space-around;
+}
+#summoner-metadata h2 {
+    margin: 0;
+}
+#summoner-metadata p {
+    margin: 0;
+}
+#summoner-metadata .flexbox {
+    width: 50%;
+    justify-content: flex-start;
+}
+#summoner-metadata {
+    justify-content: center;
+}
+#summoner-metadata .flexbox:first-child {
+    flex-direction: row-reverse;
+}
+#summoner-metadata .flexbox:first-child p {
+    text-align: right;
+}
+#summoner-metadata img {
+    width: 150px;
+    margin: 0px 40px;
+    box-shadow: 0px 0px 5px black;
+}
+
+#analysis {
+    align-items: flex-start;
+    justify-content: space-around;
+}
+
+#overall {
+    margin-bottom: 50px;
+    text-align: center;
+}
+
+span.best { color: darkorchid; }
+span.better { color: royalblue; }
+span.good { color: mediumseagreen; }
+span.bad  { color: darkorange; }
+span.worse { color: red; }
+span.worst  { color: darkslategrey; }
+
+#match-history {
+    justify-content: center;
+}
+
+#match-history .match {
+    margin: 5px;
+    padding: 5px;
+
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: 50%;
+}
+#match-history .win  { background-color: lightblue;  }
+#match-history .loss { background-color: lightcoral; }
+#match-history .vs   { background-color: grey;       }
+img.champion {
+    width: 2em;
+    margin-right: 10px;
+    /* IS THIS UNIT CORRECT ^^^ */
+}
+#match-history img.champion {
+    margin: 5px;
+}
+#match-history text.date {
+    font-size: 12px;
+    margin-left: auto;
+    margin-right: 5px;
+}

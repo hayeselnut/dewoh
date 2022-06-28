@@ -1,0 +1,436 @@
+/*******************************************************************************
+
+                                Table of Contents
+
+                            1. Global
+                            2. Typography
+                            3. Layout
+                            4. Components
+                            5. Responsive Design
+
+*******************************************************************************/
+
+/*******************************************************************************
+
+                                    GLOBAL
+
+*******************************************************************************/
+@font-face { src: url(fonts/gotham-bold.otf);  font-family: gotham-bold;  }
+@font-face { src: url(fonts/gotham-light.otf); font-family: gotham-light; }
+
+@font-face { src: url(fonts/roboto-mono.ttf); font-family: roboto-mono; }
+
+@font-face { src: url(fonts/friz-quadrata-regular.ttf); font-family: friz-quadrata-regular; }
+@font-face { src: url(fonts/friz-quadrata-bold.otf);    font-family: friz-quadrata-bold;    }
+
+html { scroll-behavior: smooth; }
+
+:focus { outline: none; }
+
+/*******************************************************************************
+
+                                    TYPOGRAPHY
+
+*******************************************************************************/
+h1 { font-size: 84px; }
+h2 { font-size: 36px; }
+h3 { font-size: 24px; }
+h4 { font-size: 18px; }
+h5 { font-size: 18px; }
+h6 { font-size: 18px; }
+
+p  { font-size: 18px; }
+li { font-size: 18px; }
+
+a { color: white; text-decoration: none; font-family: roboto-mono, monospace; }
+a:hover,
+a:focus { text-decoration: underline; }
+
+.gotham { font-family: gotham-bold, sans-serif; }
+.gotham p,
+.gotham li { font-family: gotham-light, sans-serif; font-weight: normal;}
+.gotham strong { font-family: gotham-bold, sans-serif; }
+
+.roboto-mono { font-family: roboto-mono, monospace; }
+.roboto-mono h2,
+.roboto-mono h3,
+.roboto-mono h4,
+.roboto-mono h5,
+.roboto-mono h6 { text-align: center; }
+
+.friz-quadrata { font-family: friz-quadrata-bold, serif; }
+h1.friz-quadrata { font-weight: normal; text-transform: uppercase; color: rgb(200, 156, 56); }
+/* h2.friz-quadrata { font-family: friz-quadrata-regular; font-weight: bolder; } */
+
+.open-sans { font-family: "Open Sans", sans-serif; }
+
+/*******************************************************************************
+
+                                    LAYOUT
+
+*******************************************************************************/
+.flexbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    background: white;
+}
+body > section {
+    padding: 0px 15%;
+    max-width: 1000px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+nav {
+    background: black;
+    padding-right: 100px;
+}
+nav ul {
+    list-style-type: none;
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 0;
+}
+nav li {
+    display: inline-block;
+    margin: 20px;
+}
+
+header {
+    background-color:rgb(18, 18, 18);
+    color: white;
+    margin: 0;
+}
+header .cover {
+    margin-top: 50px;
+    height: auto;
+}
+header .title {
+    margin: 5%;
+}
+header img {
+    width: 400px;
+}
+header .input {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    text-align: center;
+}
+
+#landing-page-cover {
+    background-image: url("assets/leadership_camp.JPG");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    margin: 0;
+    height: 500px;
+}
+#landing-page-title {
+    background-color: rgba(0,0,0,0.6);
+    width: 100%;
+    height: 100%;
+}
+
+footer {
+    background: black;
+    color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+footer a {
+    margin: 50px 50px;
+}
+footer .svg {
+    height: 50px;
+    transition: 1s;
+}
+footer .svg:hover,
+footer .svg:focus {
+    filter: brightness(500%);
+}
+
+/*******************************************************************************
+
+                                    COMPONENTS
+
+*******************************************************************************/
+input {
+    border: none;
+    background-color: transparent;
+    border-bottom: 1px solid white;
+
+    text-align: center;
+    font-size: 16px;
+    color: white;
+    font-family: monospace;
+}
+.invalid-input::-webkit-input-placeholder {
+    color: red;
+}
+#dedup-txtbox {
+    width: 50%;
+    min-width: 300px;
+    padding: 10px;
+    margin: 10px;
+}
+#sum1-txtbox,
+#sum2-txtbox {
+    width: 25%;
+    margin: 10px;
+}
+
+.description {
+    padding-top: 30px;
+    text-align: center;
+}
+.description p,
+.description li {
+    text-align: left;
+}
+.description img {
+    max-width: 700px;
+    width: 80%;
+}
+
+.spotify-button {
+    padding: 15px 30px;
+    border: none;
+    font-family: gotham-bold, sans-serif;
+    border-radius: 100px;
+    color: white;
+    transition-duration: 0.5s;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+#dedup-btn {
+    background-color: rgb(30, 184, 84);
+}
+#dedup-btn:hover,
+#dedup-btn:focus {
+    background-color: white;
+    color: black;
+}
+#remove-dupes-btn {
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+    display: none;
+}
+#remove-dupes-btn:hover,
+#remove-dupes-btn:focus {
+    background-color: rgb(225, 26, 43);
+    border-color: rgb(225, 26, 43);
+    color: white;
+}
+
+.results {
+    display: none;
+    padding: 50px 0px;
+    text-align: left;
+}
+#playlist-img {
+    width: 300px;
+    margin: 50px;
+    box-shadow: 00px 00px 5px grey;
+}
+
+.display-msg {
+    text-align: center;
+}
+
+#sim-songs {
+    padding-bottom: 50px;
+    display: none;
+}
+#sim-songs p {
+    padding-top: 20px;
+}
+.set-of-dupes {
+    justify-content: flex-start;
+}
+iframe {
+    margin: 0px 5px 5px 5px;
+    box-shadow: 00px 00px 5px grey;
+}
+
+
+
+
+/* EXPERIENCE */
+
+.experience {
+    background-color: skyblue;
+    display: flex;
+    flex-direction: column;
+}
+.experience div {
+    background-color: lightpink;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.experience div img {
+    width: 100px;
+    height: 100px;
+    margin-left: 10%;
+}
+.experience div p {
+    width: 60%;
+    margin-left: 10px;
+}
+
+/* PROJECTS */
+
+.projects {
+    padding: 0 10%;
+}
+.projects .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: flex-start;
+}
+.projects .card-container .card {
+    margin: 0;
+    /* background-color: red; */
+    flex-direction: row;
+    width: 50%;
+    min-width: 500px;
+    height: auto;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    transition: 0.5s ease;
+}
+.projects .card-container .card.dewoh {
+    background-image: url("assets/dewoh.png");
+}
+.projects .card-container .card.intranet {
+    background-image: url("assets/intranet.png");
+}
+.projects .card-container .card p {
+    margin: 0;
+    text-align: center;
+    opacity: 0;
+    padding-top: 250px;
+    padding-bottom: 250px;
+    font-size: 32px;
+    font-weight: 600;
+    transition: 0.5s ease;
+}
+.projects .card-container .card:hover p {
+    opacity: 1;
+    background-color: rgb(255, 255, 255, 0.5);
+}
+.projects .card-container .card:hover {
+    /* background-size: cover; */
+    /* background-position-x: -100px; */
+    transform: scale(1.1);
+}
+
+/* CHAMPS */
+.champs {
+    background-color: lightgreen;
+}
+.champs div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: flex-start;
+    background-color: lightcoral;
+}
+.champs div .card {
+    position: relative;
+    /* border-radius: 50%; */
+}
+.champs div .card img {
+    margin: 5%;
+    width: 200px;
+    transition: 0.5s ease;
+    /* border-radius: 50%;
+    box-shadow: 1px 1px 10px black; */
+}
+.champs div .card .middle {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+}
+.champs div .card:hover img {
+    opacity: 0.5;
+    transform: scale(1.1);
+}
+.champs div .card:hover .middle {
+    opacity: 1;
+}
+.champs div .card p {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    font-size: 32px;
+    padding: 16px 32px;
+}
+
+
+/*******************************************************************************
+
+                                RESPONSIVE DESIGN
+
+*******************************************************************************/
+
+@media screen and (max-width: 1200px) {
+    .gotham h1 { font-size: 64px; }
+
+    .gotham header .cover div {
+        flex-direction: column-reverse;
+    }
+
+    .gotham header img {
+        width: 200px;
+    }
+
+    #dedup-results {
+        padding: 50px 5%;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .set-of-dupes {
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    h1 { font-size: 36px; }
+
+    header img {
+        width: 150px;
+        padding: 0;
+        margin: 0;
+    }
+
+    header .input {
+        padding-top: 0;
+    }
+
+    input {
+        font-size: 14px;
+    }
+}
