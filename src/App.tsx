@@ -1,8 +1,12 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import api from './api';
 
-function App() {
+const App = () => {
+
+  api.getSummoner('Doublelift');
+
   return (
     <div className="App">
       <header className="App-header">
