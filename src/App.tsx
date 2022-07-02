@@ -1,11 +1,17 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import api from './api';
+import { api } from './api';
 
 const App = () => {
 
-  api.getSummoner('Doublelift');
+  const test = async () => {
+    const response = await api.summoner.byName('Doublelift');
+    // console.log('response', response);
+    const data = await response.json();
+    console.log('data', data);
+  };
+  test();
 
   return (
     <div className="App">

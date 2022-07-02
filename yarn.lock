@@ -8353,10 +8353,10 @@ tsutils@^3.21.0:
   dependencies:
     tslib "^1.8.1"
 
-twisted@^1.46.8:
-  version "1.46.8"
-  resolved "https://registry.yarnpkg.com/twisted/-/twisted-1.46.8.tgz#3b2c36aeccb4cc11fc4a187ef563fe4a731664f4"
-  integrity sha512-EUNgGKlhysd+E7Zy2Z/+9IJR5vACMETYWsxOKJfm6RXSmWw1qZTX/feQIdMhq7+YbdTO/Na01AsO8vzZomMfxw==
+twisted@^1.47.0:
+  version "1.47.0"
+  resolved "https://registry.yarnpkg.com/twisted/-/twisted-1.47.0.tgz#451d35e786d723473529f62d200d0ec6b06896ef"
+  integrity sha512-QR0EheR9blFYHayErD5JyAftXUg4KrDj9jIDzMqHgZjZz8QugrnJaApPWXcYzsTGoItmeLnZ8DRHA0Gt/OuVwA==
   dependencies:
     axios "^0.21.1"
     camelcasejs "^1.0.3"
