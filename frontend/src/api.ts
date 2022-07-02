@@ -10,11 +10,11 @@ class RiotGamesApi {
     }
 
     async getSummoner(name: string) {
-        const response = await fetch(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}`, {
+        const response = await fetch(`https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${name}?api_key=${this.key}`, {
             method: 'GET',
-            headers: new Headers({
-                "X-Riot-Token": this.key
-            })
+            // headers: new Headers({
+            //     "X-Riot-Token": this.key
+            // })
         });
         console.log('response', response);
         const data = await response.json();
