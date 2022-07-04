@@ -2,14 +2,13 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { api } from './api';
+import { Constants } from 'twisted';
+// import { Grommet } from 'grommet';
 
 const App = () => {
-
   const test = async () => {
-    const response = await api.summoner.byName('Doublelift');
-    // console.log('response', response);
-    const data = await response.json();
-    console.log('data', data);
+    const summoner = await api.summoner.byName('Doublelift', Constants.Regions.AMERICA_NORTH);
+    console.log('summoner', summoner);
   };
   test();
 
@@ -31,6 +30,6 @@ const App = () => {
       </header>
     </div>
   );
-}
+};
 
 export default App;
