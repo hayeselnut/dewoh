@@ -1,38 +1,37 @@
-import { Regions } from 'twisted/dist/constants';
-import { SummonerV4DTO, MatchV5DTOs } from 'twisted/dist/models-dto';
+import { Region, SummonerDto, MatchDto } from '../types';
 
 class RiotGamesApi {
   private url: string;
   readonly summoner: {
-        byName: (name: string, region: Regions) => Promise<SummonerV4DTO>,
+        byName: (name: string, region: Region) => Promise<SummonerDto>,
     };
   readonly match: {
-        byPuuid: (puuid: string, region: Regions) => Promise<string[]>,
-        byMatchId: (matchId: string, region: Regions) => Promise<MatchV5DTOs.MatchDto>,
+        byPuuid: (puuid: string, region: Region) => Promise<string[]>,
+        byMatchId: (matchId: string, region: Region) => Promise<MatchDto>,
     };
 
   constructor(url: string) {
     this.url = url;
     this.summoner = {
-      byName: async (name: string, region: Regions): Promise<SummonerV4DTO> => {
+      byName: async (name: string, region: Region): Promise<SummonerDto> => {
         const url = new URL(this.url);
         url.searchParams.set('region', region);
         url.searchParams.set('endpoint', `/lol/summoner/v4/summoners/by-name/${name}`);
-        return await this.fetch<SummonerV4DTO>(url);
+        return await this.fetch<SummonerDto>(url);
       },
     };
     this.match = {
-      byPuuid: async (puuid: string, region: Regions): Promise<string[]> => {
+      byPuuid: async (puuid: string, region: Region): Promise<string[]> => {
         const url = new URL(this.url);
         url.searchParams.set('region', region);
         url.searchParams.set('endpoint', `/lol/match/v5/matches/by-puuid/${puuid}/ids`);
         return await this.fetch<string[]>(url);
       },
-      byMatchId: async (matchId: string, region: Regions): Promise<MatchV5DTOs.MatchDto> => {
+      byMatchId: async (matchId: string, region: Region): Promise<MatchDto> => {
         const url = new URL(this.url);
         url.searchParams.set('region', region);
         url.searchParams.set('endpoint', `/lol/match/v5/matches/${matchId}`);
-        return await this.fetch<MatchV5DTOs.MatchDto>(url);
+        return await this.fetch<MatchDto>(url);
       },
     };
   }

@@ -19,7 +19,9 @@ export interface SummonerDto {
      */
     summonerLevel: number;
     /**
-     * Date summoner was last modified specified as epoch milliseconds. The following events will update this timestamp: profile icon change, playing the tutorial or advanced tutorial, finishing a game, summoner name change
+     * Date summoner was last modified specified as epoch milliseconds.
+     * The following events will update this timestamp: profile icon change,
+     * playing the tutorial or advanced tutorial, finishing a game, summoner name change
      */
     revisionDate: number;
     /**

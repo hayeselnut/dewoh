@@ -1,14 +1,11 @@
-export enum Region {
-    BRAZIL = 'BR1',
-    EU_EAST = 'EUN1',
-    EU_WEST = 'EUW1',
-    KOREA = 'KR',
-    LAT_NORTH = 'LA1',
-    LAT_SOUTH = 'LA2',
-    AMERICA_NORTH = 'NA1',
-    OCEANIA = 'OC1',
-    TURKEY = 'TR1',
-    RUSSIA = 'RU',
-    JAPAN = 'JP1',
-    PBE = 'PBE1'
-}
+export type Region = 'br1' // brazil
+                   | 'eun1' // eu east
+                   | 'euw1' // eu west
+                   | 'kr' // korea
+                   | 'la1' // lat north
+                   | 'la2' // lat south
+                   | 'na1' // north america
+                   | 'oc1' // oceania
+                   | 'tr1' // turkey
+                   | 'ru' // russia
+                   | 'jp1'; // japan
