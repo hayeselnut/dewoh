@@ -1,5 +1,5 @@
-import React from 'react';
-import { Box, Heading, Image } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Box, Button, Heading, Image } from '@chakra-ui/react';
 
 import Logo from '../assets/logo-outline-nobg.svg';
 import SummonerCard from '../components/summoner-card';
@@ -7,6 +7,21 @@ import AddSummonerCard from '../components/add-summoner-card';
 // import HelmetBro from '../assets/bg.jpg';
 
 const HomePage = () => {
+  const [summoners, setSummoners] = useState<string[]>(['', '']);
+
+  const onChange = (idx: number): (val: string) => void => {
+    console.log(summoners);
+    return (val: string): void => {
+      const newSummoners = [...summoners];
+      newSummoners[idx] = val;
+      setSummoners(newSummoners);
+    };
+  };
+
+  const addSummoner = () => {
+    setSummoners([...summoners, '']);
+  };
+
   return (
     <>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
@@ -19,12 +34,13 @@ const HomePage = () => {
         />
       </Box>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
-        <SummonerCard />
-        <SummonerCard />
-        <SummonerCard />
-        <SummonerCard />
-        {/* <SummonerCard /> */}
-        <AddSummonerCard />
+        {summoners.map((summoner, idx) =>
+          <SummonerCard key={idx} value={summoner} onChange={onChange(idx)}/>)
+        }
+        {summoners.length < 5 && <AddSummonerCard onClick={addSummoner} />}
+      </Box>
+      <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
+        <Button bg='green.500'>Search</Button>
       </Box>
     </>
   );

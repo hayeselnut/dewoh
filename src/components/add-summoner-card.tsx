@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Box } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 
-const AddSummonerCard = () => {
+const AddSummonerCard: FC<{onClick: () => void}>= ({ onClick }) => {
   return (
     <Box
       borderRadius='full'
@@ -13,7 +13,9 @@ const AddSummonerCard = () => {
       opacity='0.2'
       _hover={{
         opacity: 1,
+        cursor: 'pointer',
       }}
+      onClick={() => onClick()}
     >
       <AddIcon w={6} h={6} color='white'/>
     </Box>
