@@ -4,13 +4,12 @@ import { Box, Button, Heading, Image } from '@chakra-ui/react';
 import Logo from '../assets/logo-outline-nobg.svg';
 import SummonerCard from '../components/summoner-card';
 import AddSummonerCard from '../components/add-summoner-card';
-// import HelmetBro from '../assets/bg.jpg';
+import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   const [summoners, setSummoners] = useState<string[]>(['', '']);
 
   const onChange = (idx: number): (val: string) => void => {
-    console.log(summoners);
     return (val: string): void => {
       const newSummoners = [...summoners];
       newSummoners[idx] = val;
@@ -40,7 +39,12 @@ const HomePage = () => {
         {summoners.length < 5 && <AddSummonerCard onClick={addSummoner} />}
       </Box>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
-        <Button bg='green.500'>Search</Button>
+        <Link to={{
+          pathname: '/search',
+          search: `?summoners=${summoners.join(',')}`,
+        }}>
+          <Button bg='green.500' disabled={summoners.some((summonerName) => summonerName === '')}>Search</Button>
+        </Link>
       </Box>
     </>
   );

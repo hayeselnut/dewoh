@@ -6,6 +6,9 @@ import NavBar from '../components/nav-bar';
 const SearchPage = () => {
   const [searchParams] = useSearchParams();
 
+  // TODO: check all summoners exist, otherwise show error
+  // TODO: check all summoners are unique, otherwise show error
+
   const summoners = searchParams.get('summoners')?.split(',')?.map((summonerName) => summonerName.trim()) ?? [];
   return (
     <>
