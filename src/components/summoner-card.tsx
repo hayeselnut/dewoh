@@ -3,7 +3,11 @@ import { Box, Image, Input, IconButton } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import HelmetBro from '../assets/helmet-bro.svg';
 
-const SummonerCard: FC<{ value: string, onChange: (val: string) => void }> = ({ value, onChange }) => {
+const SummonerCard: FC<{
+  value: string,
+  onChange: (val: string) => void,
+  onClick: () => void
+}> = ({ value, onChange, onClick }) => {
   const [showCloseButton, setShowCloseButton] = useState(false);
 
   return (
@@ -32,6 +36,7 @@ const SummonerCard: FC<{ value: string, onChange: (val: string) => void }> = ({ 
         top='-3'
         right='-3'
         visibility={showCloseButton ? 'visible' : 'hidden'}
+        onClick={() => onClick()}
       />
       <Box borderRadius='full' bg='gray.200' p='12' m='2'>
         <Image

@@ -21,6 +21,14 @@ const HomePage = () => {
     setSummoners([...summoners, '']);
   };
 
+  const removeSummoner = (idx: number): () => void => {
+    return (): void => {
+      const newSummoners = [...summoners];
+      newSummoners.splice(idx, 1);
+      setSummoners(newSummoners);
+    };
+  };
+
   return (
     <>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
@@ -34,7 +42,7 @@ const HomePage = () => {
       </Box>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
         {summoners.map((summoner, idx) =>
-          <SummonerCard key={idx} value={summoner} onChange={onChange(idx)}/>)
+          <SummonerCard key={idx} value={summoner} onChange={onChange(idx)} onClick={removeSummoner(idx)} />)
         }
         {summoners.length < 5 && <AddSummonerCard onClick={addSummoner} />}
       </Box>
