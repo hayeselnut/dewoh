@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Box, Button, Heading, Image } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
 import Logo from '../assets/logo-outline-nobg.svg';
 import SummonerCard from '../components/summoner-card';
 import AddSummonerCard from '../components/add-summoner-card';
-import { Link } from 'react-router-dom';
 
 const HomePage = () => {
   const [summoners, setSummoners] = useState<string[]>(['', '']);
