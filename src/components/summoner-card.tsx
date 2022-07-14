@@ -7,7 +7,8 @@ const SummonerCard: FC<{
   value: string,
   onChange: (val: string) => void,
   onClick: () => void
-}> = ({ value, onChange, onClick }) => {
+  canRemoveSummoner: boolean,
+}> = ({ value, onChange, onClick, canRemoveSummoner }) => {
   const [showCloseButton, setShowCloseButton] = useState(false);
 
   return (
@@ -26,7 +27,8 @@ const SummonerCard: FC<{
       onMouseEnter={() => setShowCloseButton(true)}
       onMouseLeave={() => setShowCloseButton(false)}
     >
-      <IconButton
+      {canRemoveSummoner
+      && <IconButton
         icon={<CloseIcon />}
         aria-label='Delete summoner'
         bg='black'
@@ -35,9 +37,10 @@ const SummonerCard: FC<{
         size='xs'
         top='-3'
         right='-3'
-        visibility={showCloseButton ? 'visible' : 'hidden'}
+        visibility= {showCloseButton ? 'visible' : 'hidden'}
         onClick={() => onClick()}
       />
+      }
       <Box borderRadius='full' bg='gray.200' p='12' m='2'>
         <Image
           boxSize='12'

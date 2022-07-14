@@ -29,6 +29,8 @@ const HomePage = () => {
     };
   };
 
+  const canRemoveSummoner = summoners.length > 2;
+
   return (
     <>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
@@ -42,7 +44,13 @@ const HomePage = () => {
       </Box>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
         {summoners.map((summoner, idx) =>
-          <SummonerCard key={idx} value={summoner} onChange={onChange(idx)} onClick={removeSummoner(idx)} />)
+          <SummonerCard
+            key={idx}
+            value={summoner}
+            onChange={onChange(idx)}
+            onClick={removeSummoner(idx)}
+            canRemoveSummoner={canRemoveSummoner}
+          />)
         }
         {summoners.length < 5 && <AddSummonerCard onClick={addSummoner} />}
       </Box>
