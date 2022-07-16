@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Heading, Image } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import Logo from '../assets/logo-outline-nobg.svg';
 import SummonerCard from '../components/summoner-card';
@@ -8,6 +8,7 @@ import AddSummonerCard from '../components/add-summoner-card';
 
 const HomePage = () => {
   const [summoners, setSummoners] = useState<string[]>(['', '']);
+  const navigate = useNavigate();
 
   const onChange = (idx: number): (val: string) => void => {
     return (val: string): void => {
@@ -31,6 +32,13 @@ const HomePage = () => {
 
   const canRemoveSummoner = summoners.length > 2;
 
+  const onSubmit = () => {
+    navigate({
+      pathname: '/search',
+      search: `?summoners=${summoners.join(',')}`,
+    });
+  };
+
   return (
     <>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
@@ -50,18 +58,20 @@ const HomePage = () => {
             onChange={onChange(idx)}
             onClick={removeSummoner(idx)}
             canRemoveSummoner={canRemoveSummoner}
-          />)
-        }
+          />,
+        )}
         {summoners.length < 5 && <AddSummonerCard onClick={addSummoner} />}
       </Box>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
-        <Link to={{
-          pathname: '/search',
-          search: `?summoners=${summoners.join(',')}`,
-        }}>
-          <Button bg='green.500' disabled={summoners.some((summonerName) => summonerName === '')}>Search</Button>
-        </Link>
+        <Button
+          onClick={onSubmit}
+          bg='green.500'
+          disabled={summoners.some((summonerName) => summonerName === '')}
+        >
+              Search
+        </Button>
       </Box>
+
     </>
   );
 };

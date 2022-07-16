@@ -20,7 +20,7 @@ const SummonerCard: FC<{
       borderWidth='2px'
       borderRadius='lg'
       position='relative'
-      maxW='12%'
+      w='12%'
       bg='white'
       p='2'
       m='2'
