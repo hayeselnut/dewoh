@@ -1,6 +1,4 @@
 import React, { FC, KeyboardEvent, useState } from 'react';
-import { Box, Image, Input, IconButton } from '@chakra-ui/react';
-import { CloseIcon } from '@chakra-ui/icons';
 import HelmetBro from '../assets/helmet-bro.svg';
 
 const SummonerCard: FC<{
@@ -17,53 +15,52 @@ const SummonerCard: FC<{
   };
 
   return (
-    <Box
-      display='flex'
-      flexDirection='column'
-      justifyContent='center'
-      alignItems='center'
-      borderWidth='2px'
-      borderRadius='lg'
-      position='relative'
-      w='12%'
-      bg='white'
-      p='2'
-      m='2'
-      onMouseEnter={() => setShowCloseButton(true)}
-      onMouseLeave={() => setShowCloseButton(false)}
-    >
-      {canRemoveSummoner
-      && <IconButton
-        icon={<CloseIcon />}
-        aria-label='Delete summoner'
-        bg='black'
-        borderRadius='full'
-        position='absolute'
-        size='xs'
-        top='-3'
-        right='-3'
-        visibility= {showCloseButton ? 'visible' : 'hidden'}
-        onClick={() => onClick()}
+      <Image
+        boxSize='4vw'
+        opacity='0.25'
+        m='6'
+        fit='cover'
+        src={HelmetBro}
+        alt='Summoner icon placeholder'
       />
-      }
-      <Box borderRadius='full' bg='gray.200' p='12' m='2'>
-        <Image
-          boxSize='12'
-          opacity='0.25'
-          fit='cover'
-          src={HelmetBro}
-          alt='Summoner icon placeholder'
+      <Box
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        borderWidth='2px'
+        borderRadius='lg'
+        position='relative'
+        w='12vw'
+        h='12vw'
+        bg='white'
+        p='2'
+        m='2'
+        onMouseEnter={() => setShowCloseButton(true)}
+        onMouseLeave={() => setShowCloseButton(false)}
+      >
+        {canRemoveSummoner
+        && <IconButton
+          icon={<CloseIcon />}
+          aria-label='Delete summoner'
+          bg='black'
+          borderRadius='full'
+          position='absolute'
+          size='xs'
+          top='-3'
+          right='-3'
+          visibility= {showCloseButton ? 'visible' : 'hidden'}
+          onClick={() => onClick()}
+        />
+        }
+        <Input
+          placeholder='Summoner name'
+          color='black'
+          m='2'
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
       </Box>
-      <Input
-        placeholder='Summoner name'
-        color='black'
-        m='2'
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-    </Box>
   );
 };
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
 import {
   BrowserRouter,
   Routes,
@@ -17,14 +16,12 @@ const App = () => {
   test();
 
   return (
-    <ChakraProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route index element={<HomePage />} />
-          <Route path="search" element={<SearchPage />} />
-        </Routes>
-      </BrowserRouter>
-    </ChakraProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route index element={<HomePage />} />
+        <Route path="search" element={<SearchPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 

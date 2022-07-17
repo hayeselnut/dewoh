@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Box, Button, Heading, Image } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
 import Logo from '../assets/logo-outline-nobg.svg';
@@ -46,7 +45,7 @@ const HomePage = () => {
   return (
     <>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
-        <Heading as='h1' size='4xl'>Duo Diff</Heading>
+        <Heading as='h1' size='4xl'>DUO DIFF</Heading>
         <Image
           boxSize='16rem'
           objectFit='cover'
@@ -54,7 +53,7 @@ const HomePage = () => {
           alt='Logo'
         />
       </Box>
-      <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
+      <Box display='flex' flexDirection='column' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
         {summoners.map((summoner, idx) =>
           <SummonerCard
             key={idx}
