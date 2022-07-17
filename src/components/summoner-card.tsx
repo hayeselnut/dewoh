@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, KeyboardEvent, useState } from 'react';
 import { Box, Image, Input, IconButton } from '@chakra-ui/react';
 import { CloseIcon } from '@chakra-ui/icons';
 import HelmetBro from '../assets/helmet-bro.svg';
@@ -6,10 +6,15 @@ import HelmetBro from '../assets/helmet-bro.svg';
 const SummonerCard: FC<{
   value: string,
   onChange: (val: string) => void,
-  onClick: () => void
+  onClick: () => void,
+  onEnter: () => void,
   canRemoveSummoner: boolean,
-}> = ({ value, onChange, onClick, canRemoveSummoner }) => {
+}> = ({ value, onChange, onClick, onEnter, canRemoveSummoner }) => {
   const [showCloseButton, setShowCloseButton] = useState(false);
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key === 'Enter') onEnter();
+  };
 
   return (
     <Box
@@ -50,7 +55,14 @@ const SummonerCard: FC<{
           alt='Summoner icon placeholder'
         />
       </Box>
-      <Input placeholder='Summoner name' color='black' m='2' value={value} onChange={(e) => onChange(e.target.value)} />
+      <Input
+        placeholder='Summoner name'
+        color='black'
+        m='2'
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
     </Box>
   );
 };

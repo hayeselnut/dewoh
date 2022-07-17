@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, Heading, Image } from '@chakra-ui/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import Logo from '../assets/logo-outline-nobg.svg';
 import SummonerCard from '../components/summoner-card';
@@ -30,9 +30,13 @@ const HomePage = () => {
     };
   };
 
+  const canSearch = !summoners.some((summonerName) => summonerName === '');
+
   const canRemoveSummoner = summoners.length > 2;
 
-  const onSubmit = () => {
+  const searchSummoners = () => {
+    if (!canSearch) return;
+
     navigate({
       pathname: '/search',
       search: `?summoners=${summoners.join(',')}`,
@@ -57,6 +61,7 @@ const HomePage = () => {
             value={summoner}
             onChange={onChange(idx)}
             onClick={removeSummoner(idx)}
+            onEnter={searchSummoners}
             canRemoveSummoner={canRemoveSummoner}
           />,
         )}
@@ -64,9 +69,9 @@ const HomePage = () => {
       </Box>
       <Box display='flex' alignItems='center' justifyContent='center' padding='4' bg='gray.800' color='white'>
         <Button
-          onClick={onSubmit}
+          onClick={searchSummoners}
           bg='green.500'
-          disabled={summoners.some((summonerName) => summonerName === '')}
+          disabled={!canSearch}
         >
               Search
         </Button>
